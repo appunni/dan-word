@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>Lyt &amp; Gæt · Danish Listening Game</title>
+  </head>
+  <body>
+    <div id="app">
+      <main class="stage">
+        <header class="stage-header">
+          <span class="chip">🇩🇰 DANSK</span>
+          <h1>Lyt &amp; Gæt</h1>
+          <p class="tagline">Hear the word. Pick the meaning. Keep going.</p>
+        </header>
+
+        <section class="sound-panel">
+          <button id="replayBtn" class="speaker-btn" type="button" aria-label="Play word">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+            </svg>
+          </button>
+          <p class="replay-hint">tap to hear it again</p>
+          <p id="revealedWord" class="revealed-word" aria-live="polite"></p>
+        </section>
+
+        <div id="options" class="options-grid">
+          <button class="option-btn" data-index="0" type="button"></button>
+          <button class="option-btn" data-index="1" type="button"></button>
+          <button class="option-btn" data-index="2" type="button"></button>
+          <button class="option-btn" data-index="3" type="button"></button>
+        </div>
+      </main>
+
+      <footer class="next-bar">
+        <button id="nextBtn" class="next-btn" type="button" disabled>Next word →</button>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

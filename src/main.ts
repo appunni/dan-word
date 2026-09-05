@@ -16,12 +16,21 @@ let weights = loadWeights()
 let danishVoice: SpeechSynthesisVoice | undefined
 let currentWord: Word = wordList[0]
 let answered = false
+let speechRequestId = 0
 const recentHistory: string[] = []
 
 function loadWeights(): Record<string, number> {
   try {
     const raw = localStorage.getItem(WEIGHTS_KEY)
-    return raw ? (JSON.parse(raw) as Record<string, number>) : {}
+    const parsed: unknown = raw ? JSON.parse(raw) : {}
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return {}
+
+    const validWords = new Set(wordList.map((word) => word.da))
+    return Object.fromEntries(
+      Object.entries(parsed).filter(([word, weight]) =>
+        validWords.has(word) && typeof weight === 'number' && Number.isFinite(weight) && weight > 0,
+      ),
+    )
   } catch {
     return {}
   }
@@ -36,7 +45,12 @@ function saveWeights(): void {
 }
 
 function shuffle<T>(items: T[]): T[] {
-  return [...items].sort(() => Math.random() - 0.5)
+  const result = [...items]
+  for (let index = result.length - 1; index > 0; index--) {
+    const randomIndex = Math.floor(Math.random() * (index + 1))
+    ;[result[index], result[randomIndex]] = [result[randomIndex], result[index]]
+  }
+  return result
 }
 
 function pickWeightedWord(): Word {
@@ -76,9 +90,12 @@ function pickDistractors(correct: Word, count: number): Word[] {
 function loadVoices(): void {
   if (!supportsSpeech) return
   const voices = window.speechSynthesis.getVoices()
-  const danishVoices = voices.filter((voice) => voice.lang === 'da-DK' || voice.lang.startsWith('da'))
-  const exact = danishVoices.filter((voice) => voice.lang === 'da-DK')
-  const prefixed = danishVoices.filter((voice) => voice.lang !== 'da-DK')
+  const danishVoices = voices.filter((voice) => {
+    const language = voice.lang.toLowerCase()
+    return language === 'da' || language.startsWith('da-')
+  })
+  const exact = danishVoices.filter((voice) => voice.lang.toLowerCase() === 'da-dk')
+  const prefixed = danishVoices.filter((voice) => voice.lang.toLowerCase() !== 'da-dk')
   // Prefer network-backed voices (typically higher quality, e.g. Google's) over
   // local/offline ones when a language has both, falling back to whatever's available.
   const pickBest = (list: SpeechSynthesisVoice[]) => list.find((voice) => !voice.localService) ?? list[0]
@@ -88,13 +105,19 @@ function loadVoices(): void {
 function speak(text: string): void {
   if (!supportsSpeech) return
   window.speechSynthesis.cancel()
+  const requestId = ++speechRequestId
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'da-DK'
   utterance.rate = 0.82
   if (danishVoice) utterance.voice = danishVoice
-  utterance.onstart = () => wordBtn.classList.add('speaking')
-  utterance.onend = () => wordBtn.classList.remove('speaking')
-  utterance.onerror = () => wordBtn.classList.remove('speaking')
+  utterance.onstart = () => {
+    if (requestId === speechRequestId) wordBtn.classList.add('speaking')
+  }
+  const stopSpeaking = () => {
+    if (requestId === speechRequestId) wordBtn.classList.remove('speaking')
+  }
+  utterance.onend = stopSpeaking
+  utterance.onerror = stopSpeaking
   window.speechSynthesis.speak(utterance)
 }
 

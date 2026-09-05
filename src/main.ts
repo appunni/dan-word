@@ -2,6 +2,7 @@ import './style.css'
 import { wordList, type Word } from './words'
 
 const WEIGHTS_KEY = 'danword:wrongCounts'
+const RECENT_HISTORY_LIMIT = 20
 
 const revealedWordEl = document.querySelector<HTMLSpanElement>('#revealedWord')!
 const wordBtn = document.querySelector<HTMLButtonElement>('#wordBtn')!
@@ -15,6 +16,7 @@ let weights = loadWeights()
 let danishVoice: SpeechSynthesisVoice | undefined
 let currentWord: Word = wordList[0]
 let answered = false
+const recentHistory: string[] = []
 
 function loadWeights(): Record<string, number> {
   try {
@@ -37,21 +39,25 @@ function shuffle<T>(items: T[]): T[] {
   return [...items].sort(() => Math.random() - 0.5)
 }
 
-function pickWeightedWord(exclude?: Word): Word {
-  const weighted = wordList.map((word) => ({ word, weight: 1 + (weights[word.da] ?? 0) * 2 }))
+function pickWeightedWord(): Word {
+  const excluded = new Set(recentHistory)
+  const candidates = wordList.filter((word) => !excluded.has(word.da))
+  const pool = candidates.length > 0 ? candidates : wordList
+
+  const weighted = pool.map((word) => ({ word, weight: 1 + (weights[word.da] ?? 0) * 2 }))
   const total = weighted.reduce((sum, item) => sum + item.weight, 0)
 
-  for (let attempt = 0; attempt < 10; attempt++) {
-    let roll = Math.random() * total
-    for (const item of weighted) {
-      roll -= item.weight
-      if (roll <= 0) {
-        if (!exclude || item.word.da !== exclude.da) return item.word
-        break
-      }
-    }
+  let roll = Math.random() * total
+  for (const item of weighted) {
+    roll -= item.weight
+    if (roll <= 0) return item.word
   }
-  return wordList[Math.floor(Math.random() * wordList.length)]
+  return pool[pool.length - 1]
+}
+
+function rememberWord(word: Word): void {
+  recentHistory.push(word.da)
+  if (recentHistory.length > RECENT_HISTORY_LIMIT) recentHistory.shift()
 }
 
 function pickDistractors(correct: Word, count: number): Word[] {
@@ -70,7 +76,13 @@ function pickDistractors(correct: Word, count: number): Word[] {
 function loadVoices(): void {
   if (!supportsSpeech) return
   const voices = window.speechSynthesis.getVoices()
-  danishVoice = voices.find((voice) => voice.lang === 'da-DK') ?? voices.find((voice) => voice.lang.startsWith('da'))
+  const danishVoices = voices.filter((voice) => voice.lang === 'da-DK' || voice.lang.startsWith('da'))
+  const exact = danishVoices.filter((voice) => voice.lang === 'da-DK')
+  const prefixed = danishVoices.filter((voice) => voice.lang !== 'da-DK')
+  // Prefer network-backed voices (typically higher quality, e.g. Google's) over
+  // local/offline ones when a language has both, falling back to whatever's available.
+  const pickBest = (list: SpeechSynthesisVoice[]) => list.find((voice) => !voice.localService) ?? list[0]
+  danishVoice = pickBest(exact) ?? pickBest(prefixed)
 }
 
 function speak(text: string): void {
@@ -78,15 +90,18 @@ function speak(text: string): void {
   window.speechSynthesis.cancel()
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'da-DK'
+  utterance.rate = 0.82
   if (danishVoice) utterance.voice = danishVoice
   utterance.onstart = () => wordBtn.classList.add('speaking')
   utterance.onend = () => wordBtn.classList.remove('speaking')
+  utterance.onerror = () => wordBtn.classList.remove('speaking')
   window.speechSynthesis.speak(utterance)
 }
 
 function startRound(): void {
   answered = false
-  currentWord = pickWeightedWord(currentWord)
+  currentWord = pickWeightedWord()
+  rememberWord(currentWord)
   const options = shuffle([currentWord, ...pickDistractors(currentWord, 3)])
 
   revealedWordEl.textContent = ''

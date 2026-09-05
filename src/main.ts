@@ -4,7 +4,7 @@ import { wordList, type Word } from './words'
 const WEIGHTS_KEY = 'danword:wrongCounts'
 
 const revealedWordEl = document.querySelector<HTMLParagraphElement>('#revealedWord')!
-const replayBtn = document.querySelector<HTMLButtonElement>('#replayBtn')!
+const wordBtn = document.querySelector<HTMLButtonElement>('#wordBtn')!
 const nextBtn = document.querySelector<HTMLButtonElement>('#nextBtn')!
 const optionButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.option-btn'))
 
@@ -70,8 +70,8 @@ function speak(text: string): void {
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'da-DK'
   if (danishVoice) utterance.voice = danishVoice
-  utterance.onstart = () => replayBtn.classList.add('speaking')
-  utterance.onend = () => replayBtn.classList.remove('speaking')
+  utterance.onstart = () => wordBtn.classList.add('speaking')
+  utterance.onend = () => wordBtn.classList.remove('speaking')
   window.speechSynthesis.speak(utterance)
 }
 
@@ -81,6 +81,7 @@ function startRound(): void {
   const options = shuffle([currentWord, ...pickDistractors(currentWord, 3)])
 
   revealedWordEl.textContent = ''
+  wordBtn.classList.remove('revealed', 'correct', 'incorrect')
   nextBtn.disabled = true
 
   optionButtons.forEach((btn, i) => {
@@ -116,6 +117,7 @@ function handleAnswer(selected: HTMLButtonElement): void {
   })
 
   revealedWordEl.textContent = currentWord.da
+  wordBtn.classList.add('revealed', isCorrect ? 'correct' : 'incorrect')
   nextBtn.disabled = false
   speak(currentWord.da)
 }
@@ -126,7 +128,7 @@ window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
 optionButtons.forEach((btn) => {
   btn.addEventListener('click', () => handleAnswer(btn))
 })
-replayBtn.addEventListener('click', () => speak(currentWord.da))
+wordBtn.addEventListener('click', () => speak(currentWord.da))
 nextBtn.addEventListener('click', () => startRound())
 
 startRound()

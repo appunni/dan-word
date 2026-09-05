@@ -24,7 +24,7 @@
         <section class="sound-panel">
           <button id="wordBtn" class="word-btn" type="button" aria-label="Play word">
             <span class="grain" aria-hidden="true"></span>
-            <p id="revealedWord" class="word-text" aria-live="polite"></p>
+            <span id="revealedWord" class="word-text" lang="da" aria-live="polite"></span>
             <span class="word-icon-wrap" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
@@ -34,6 +34,9 @@
             </span>
           </button>
           <p class="replay-hint">tap to hear it again</p>
+          <p id="unsupportedNotice" class="unsupported-notice" hidden>
+            Your browser doesn't support text-to-speech. Try Chrome, Edge, or Safari.
+          </p>
         </section>
 
         <div id="options" class="options-grid">

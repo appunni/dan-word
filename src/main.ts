@@ -3,10 +3,13 @@ import { wordList, type Word } from './words'
 
 const WEIGHTS_KEY = 'danword:wrongCounts'
 
-const revealedWordEl = document.querySelector<HTMLParagraphElement>('#revealedWord')!
+const revealedWordEl = document.querySelector<HTMLSpanElement>('#revealedWord')!
 const wordBtn = document.querySelector<HTMLButtonElement>('#wordBtn')!
 const nextBtn = document.querySelector<HTMLButtonElement>('#nextBtn')!
 const optionButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.option-btn'))
+const unsupportedNotice = document.querySelector<HTMLParagraphElement>('#unsupportedNotice')!
+
+const supportsSpeech = 'speechSynthesis' in window
 
 let weights = loadWeights()
 let danishVoice: SpeechSynthesisVoice | undefined
@@ -23,7 +26,11 @@ function loadWeights(): Record<string, number> {
 }
 
 function saveWeights(): void {
-  localStorage.setItem(WEIGHTS_KEY, JSON.stringify(weights))
+  try {
+    localStorage.setItem(WEIGHTS_KEY, JSON.stringify(weights))
+  } catch {
+    // ignore write errors (e.g. private browsing, storage full)
+  }
 }
 
 function shuffle<T>(items: T[]): T[] {
@@ -61,11 +68,13 @@ function pickDistractors(correct: Word, count: number): Word[] {
 }
 
 function loadVoices(): void {
+  if (!supportsSpeech) return
   const voices = window.speechSynthesis.getVoices()
   danishVoice = voices.find((voice) => voice.lang === 'da-DK') ?? voices.find((voice) => voice.lang.startsWith('da'))
 }
 
 function speak(text: string): void {
+  if (!supportsSpeech) return
   window.speechSynthesis.cancel()
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'da-DK'
@@ -123,7 +132,11 @@ function handleAnswer(selected: HTMLButtonElement): void {
 }
 
 loadVoices()
-window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
+if (supportsSpeech) {
+  window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
+} else {
+  unsupportedNotice.hidden = false
+}
 
 optionButtons.forEach((btn) => {
   btn.addEventListener('click', () => handleAnswer(btn))

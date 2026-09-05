@@ -64,4 +64,18 @@ export const wordList: Word[] = [
   { da: 'lukke', en: 'close (verb)' }, { da: 'kort', en: 'short' }, { da: 'lang', en: 'long' }, { da: 'høj', en: 'tall' }, { da: 'lav', en: 'low' },
   { da: 'tung', en: 'heavy' }, { da: 'let', en: 'light (weight)' }, { da: 'bedstemor', en: 'grandmother' }, { da: 'bedstefar', en: 'grandfather' }, { da: 'onkel', en: 'uncle' },
   { da: 'tante', en: 'aunt' },
+
+  { da: 'hvem', en: 'who' }, { da: 'hvordan', en: 'how' }, { da: 'hvorfor', en: 'why' }, { da: 'hvilken', en: 'which' }, { da: 'fordi', en: 'because' },
+  { da: 'før', en: 'before' }, { da: 'under', en: 'under' }, { da: 'mellem', en: 'between' }, { da: 'uden', en: 'without' }, { da: 'mod', en: 'toward' },
+  { da: 'derfor', en: 'therefore' }, { da: 'bus', en: 'bus' }, { da: 'tog', en: 'train' }, { da: 'cykel', en: 'bicycle' }, { da: 'station', en: 'station' },
+  { da: 'butik', en: 'shop' }, { da: 'restaurant', en: 'restaurant' }, { da: 'toilet', en: 'toilet' }, { da: 'gade', en: 'street' }, { da: 'lufthavn', en: 'airport' },
+  { da: 'kaffe', en: 'coffee' }, { da: 'te', en: 'tea' }, { da: 'brød', en: 'bread' }, { da: 'mælk', en: 'milk' }, { da: 'øl', en: 'beer' },
+  { da: 'vin', en: 'wine' }, { da: 'morgenmad', en: 'breakfast' }, { da: 'frokost', en: 'lunch' }, { da: 'aftensmad', en: 'dinner' }, { da: 'regning', en: 'bill' },
+  { da: 'vær så god', en: 'here you are' }, { da: 'det var så lidt', en: "you're welcome" }, { da: 'jeg forstår ikke', en: "I don't understand" },
+  { da: 'taler du engelsk', en: 'do you speak English?' }, { da: 'kan du hjælpe mig', en: 'can you help me?' },
+  { da: 'bo', en: 'live (reside)' }, { da: 'stå op', en: 'get up' }, { da: 'sætte', en: 'put/set' }, { da: 'ligge', en: 'lie/be situated' }, { da: 'sidde', en: 'sit' },
+  { da: 'vise', en: 'show' }, { da: 'forstå', en: 'understand' }, { da: 'prøve', en: 'try' }, { da: 'vælge', en: 'choose' }, { da: 'begynde', en: 'begin' },
+  { da: 'slutte', en: 'finish' }, { da: 'vigtig', en: 'important' }, { da: 'klar', en: 'ready/clear' }, { da: 'fri', en: 'free (available)' },
+  { da: 'optaget', en: 'busy' }, { da: 'sikker', en: 'safe/certain' }, { da: 'farlig', en: 'dangerous' }, { da: 'køkken', en: 'kitchen' },
+  { da: 'badeværelse', en: 'bathroom' }, { da: 'lejlighed', en: 'apartment' }, { da: 'læge', en: 'doctor' }, { da: 'hospital', en: 'hospital' }, { da: 'apotek', en: 'pharmacy' },
 ]

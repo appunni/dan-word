@@ -2,7 +2,8 @@ import './style.css'
 import { wordList, type Word } from './words'
 
 const WEIGHTS_KEY = 'danword:wrongCounts'
-const RECENT_HISTORY_LIMIT = 20
+const RECENT_HISTORY_KEY = 'danword:recentHistory'
+const RECENT_HISTORY_LIMIT = 50
 
 const revealedWordEl = document.querySelector<HTMLSpanElement>('#revealedWord')!
 const wordBtn = document.querySelector<HTMLButtonElement>('#wordBtn')!
@@ -17,7 +18,7 @@ let danishVoice: SpeechSynthesisVoice | undefined
 let currentWord: Word = wordList[0]
 let answered = false
 let speechRequestId = 0
-const recentHistory: string[] = []
+const recentHistory = loadRecentHistory()
 
 function loadWeights(): Record<string, number> {
   try {
@@ -39,6 +40,29 @@ function loadWeights(): Record<string, number> {
 function saveWeights(): void {
   try {
     localStorage.setItem(WEIGHTS_KEY, JSON.stringify(weights))
+  } catch {
+    // ignore write errors (e.g. private browsing, storage full)
+  }
+}
+
+function loadRecentHistory(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENT_HISTORY_KEY)
+    const parsed: unknown = raw ? JSON.parse(raw) : []
+    if (!Array.isArray(parsed)) return []
+
+    const validWords = new Set(wordList.map((word) => word.da))
+    return parsed
+      .filter((word): word is string => typeof word === 'string' && validWords.has(word))
+      .slice(-RECENT_HISTORY_LIMIT)
+  } catch {
+    return []
+  }
+}
+
+function saveRecentHistory(): void {
+  try {
+    localStorage.setItem(RECENT_HISTORY_KEY, JSON.stringify(recentHistory))
   } catch {
     // ignore write errors (e.g. private browsing, storage full)
   }
@@ -72,6 +96,7 @@ function pickWeightedWord(): Word {
 function rememberWord(word: Word): void {
   recentHistory.push(word.da)
   if (recentHistory.length > RECENT_HISTORY_LIMIT) recentHistory.shift()
+  saveRecentHistory()
 }
 
 function pickDistractors(correct: Word, count: number): Word[] {

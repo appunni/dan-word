@@ -12,7 +12,7 @@ A simple Danish listening game. Hear a Danish word, choose its English meaning, 
 - Danish pronunciation using your browser's built-in speech voice
 - Four-choice listening practice with replay support
 - Incorrect answers appear more often for extra practice
-- A 20-round no-repeat window
+- A 50-word no-repeat window that continues across sessions
 - No score or timer — just practice at your own pace
 
 ## Run locally

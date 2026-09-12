@@ -8,7 +8,7 @@ A simple Danish listening game. Hear a Danish word, choose its English meaning, 
 
 ## Features
 
-- 349 everyday Danish words with English translations
+- 418 everyday Danish words with English translations
 - Danish pronunciation using your browser's built-in speech voice
 - Four-choice listening practice with replay support
 - Incorrect answers appear more often for extra practice
